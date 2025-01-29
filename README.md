@@ -50,26 +50,26 @@ cd <repository_folder>
 ---
 
 ## **Test the `healthz` API**  
-   Use the following **cURL** commands to test the API:
+   Use the following **CURL** commands to test the API:
 
    - **Valid request returning 200 OK**  
-     bash
+     ```bash
      curl -vvvv http://localhost:8080/healthz
-     
+     ```
      Expected response: **200 OK**
 
    - **Unsupported HTTP method returning 405**  
-     bash
+     ```bash
      curl -vvvv -XPUT http://localhost:8080/healthz
-     
+     ```
      Expected response: **405 Method Not Allowed**
 
    - **Invalid request body returning 400**  
-     bash
+     ```bash
      curl -vvvv -X GET -d '{}' -H "Content-Type: application/json" http://localhost:8080/healthz
      ```
      Expected response: *400 Bad Request*
 
-   - *Database connection failure returning 503*  
+   - **Database connection failure returning 503**
      If the database connection is not established, the endpoint will return:
      *503 Service Unavailable*
