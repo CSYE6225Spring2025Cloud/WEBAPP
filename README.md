@@ -36,14 +36,40 @@ cd <repository_folder>
 ```
 ---
 
-## **Steps to run app**
-1.npm install
-2. Start server - npm start
+## **Install dependencies** 
+   Install the required Node.js modules by running:
+   bash
+   npm i
 
-## **Steps to test the api
-1. Open the terminal 
-2. run the commands 
-   2.1 curl -X GET http://localhost:8080/api/healthz (gives 200 Ok)
-   2.2 Stop the mysql server and run $ curl -vvvv http://localhost:8080/healthz  (gives 503 bad request )
-   2.3 curl -vvvv -XPUT http://localhost:8080/healthz ( gives 405 bad request)
-   2.4 curl -X GET -H "Content-Type: application/json" -d '{"":""}' http://localhost:8080/api/healthz (gives 400 bad request) 
+--- 
+## **Start the application**  
+   Start the application by running the following command:
+   bash
+   npm start
+
+---
+
+## **Test the `healthz` API**  
+   Use the following **cURL** commands to test the API:
+
+   - **Valid request returning 200 OK**  
+     bash
+     curl -vvvv http://localhost:8080/healthz
+     
+     Expected response: **200 OK**
+
+   - **Unsupported HTTP method returning 405**  
+     bash
+     curl -vvvv -XPUT http://localhost:8080/healthz
+     
+     Expected response: **405 Method Not Allowed**
+
+   - **Invalid request body returning 400**  
+     bash
+     curl -vvvv -X GET -d '{}' -H "Content-Type: application/json" http://localhost:8080/healthz
+     ```
+     Expected response: *400 Bad Request*
+
+   - *Database connection failure returning 503*  
+     If the database connection is not established, the endpoint will return:
+     *503 Service Unavailable*
