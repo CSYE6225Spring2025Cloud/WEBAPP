@@ -2,22 +2,23 @@ const HealthCheck = require("../models")
 
 const healthCheck = async (req, res) => {
   try {
-    if (Object.keys(req.body).length) {
+    if (req.headers['content-length'] && parseInt(req.headers['content-length'],10) > 0) 
+    {
       return res.status(400).set('Cache-Control', 'no-cache, no-store, must-revalidate')
       .set('Pragma', 'no-cache')
       .set('X-Content-Type-Options', 'nosniff')
-      .end();
+      .end(); // This is when we pass body or empty string 
     }
     await HealthCheck.create({});
     res.status(200).set('Cache-Control', 'no-cache, no-store, must-revalidate')
     .set('Pragma', 'no-cache')
     .set('X-Content-Type-Options', 'nosniff')
-    .end();
+    .end(); // if there is no body pass and get method used
   } catch (error) {
     res.status(503).set('Cache-Control', 'no-cache, no-store, must-revalidate')
     .set('Pragma', 'no-cache')
     .set('X-Content-Type-Options', 'nosniff')
-    .end();
+    .end();  
   }
 };
 
@@ -25,7 +26,7 @@ const methodNotAllowed = (req, res) => {
   res.status(405).set('Cache-Control', 'no-cache, no-store, must-revalidate')
   .set('Pragma', 'no-cache')
   .set('X-Content-Type-Options', 'nosniff')
-  .end();
+  .end(); // if we use method other than GET
 };
 
 module.exports = { healthCheck, methodNotAllowed };
