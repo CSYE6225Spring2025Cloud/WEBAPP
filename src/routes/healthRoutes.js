@@ -3,7 +3,7 @@ const { healthCheck, methodNotAllowed } = require('../controllers/healthControll
 
 const router = express.Router();
 
-router.get('/healthz', healthCheck);
-router.all('/healthz', methodNotAllowed);
+router.get('/', healthCheck);
+router.all('/', methodNotAllowed);
 
 module.exports = router;
