@@ -9,6 +9,13 @@ const healthCheck = async (req, res) => {
       .set('X-Content-Type-Options', 'nosniff')
       .end(); // This is when we pass body or empty string 
     }
+    if (Object.keys(req.query).length > 0 || Object.keys(req.params).length > 0 ) {
+      return res.status(400).set('Cache-Control', 'no-cache, no-store, must-revalidate')
+      .set('Pragma', 'no-cache')
+      .set('X-Content-Type-Options', 'nosniff')
+      .end();
+    }
+
     await HealthCheck.create({});
     res.status(200).set('Cache-Control', 'no-cache, no-store, must-revalidate')
     .set('Pragma', 'no-cache')

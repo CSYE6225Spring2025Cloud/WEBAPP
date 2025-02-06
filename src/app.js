@@ -5,7 +5,7 @@ const healthRoutes = require('./routes/healthRoutes');
 const app = express();
 
 app.use(bodyParser.json());
-app.use('/api', healthRoutes);
+app.use('/healthz',healthRoutes);
 
 app.use((err,req,res,next) =>{
     if(err instanceof SyntaxError && err.status ===400 && 'body' in err){
@@ -13,5 +13,15 @@ app.use((err,req,res,next) =>{
         return res.status(400).send();
     }
 });
+
+app.use((req, res) => {
+    res.status(404) // 404 Not Found
+        .set('Cache-Control', 'no-cache, no-store, must-revalidate')
+        .set('Pragma', 'no-cache')
+        .set('X-Content-Type-Options', 'nosniff')
+        .set('Content-Length', '0') // Explicitly set Content-Length to 0
+        .send(); // Send empty response
+  });
+
 
 module.exports = app;

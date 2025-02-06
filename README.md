@@ -73,3 +73,47 @@ cd <repository_folder>
    - **Database connection failure returning 503**
      If the database connection is not established, the endpoint will return:
      *503 Service Unavailable*
+    
+---
+## **Automating Application Setup with Shell Script**
+   - **Create a Droplet (VM)**
+      1. Login to DigitalOcean → Go to Droplets → Click Create Droplet.
+      2. Choose Ubuntu 24.04 LTS as the OS.
+      3. Select a Basic Plan (Recommended: 2GB RAM, 1 vCPU).
+      4. Choose a Region close to you.
+      5. Enable SSH Authentication (if you have an SSH key added).
+      6. Click Create Droplet.
+    
+   - **Connect to the VM**
+     ```bash
+     ssh root@your_droplet_ip
+     ```
+     
+   - **Upload setup.sh to Ubuntu**
+     ```bash
+     scp -i ~/.ssh/DigitalOcean setup.sh root@your_droplet_ip:/root/
+     ```
+
+   - **Give Execution Permission to setup.sh**
+     ```bash
+     chmod +x setup.sh
+     ```
+   - **Upload & Extract app.zip**
+     On local machine run:
+      ```bash
+     scp -i ~/.ssh/DigitalOcean root@your_droplet_ip:/temp/
+     ```
+   - **Run setup.sh**
+     ```bash
+     ./setup.sh
+     ```
+   - **To run the application**
+     1. do npm i
+     2. run npm start
+     3. And follow the curl commands mentioned above
+     4. Also change the localhost api and db name if changed in mysql
+     
+ - **To run test cases on local run command**
+      ```bash
+      npm install --save-dev jest supertest
+      ```      
