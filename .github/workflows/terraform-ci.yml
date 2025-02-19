@@ -12,12 +12,12 @@ jobs:
 
     services:
       mysql:
-        image: mysql:5.7
+        image: mysql:latest
         env:
           MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
           MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
           MYSQL_USER: ${{ secrets.MYSQL_USER }}
-          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
         ports:
           - 3306:3306
         options: >-
@@ -40,8 +40,8 @@ jobs:
 
       - name: Configure Environment Variables
         run: |
-          echo "DATABASE_URL=mysql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@mysql:3306/${{ secrets.DB_NAME }}" >> $GITHUB_ENV
-          echo "PORT=${{ secrets.PORT }}" >> $GITHUB_ENV
+          echo "DATABASE_URL=mysql://${{ secrets.MYSQL_USER }}:${{ secrets.MYSQL_ROOT_PASSWORD }}@mysql:3306/${{ secrets.MYSQL_DATABASE }}" >> $.env
+          echo "PORT=${{ secrets.PORT }}" >> $.env
 
       - name: Wait for MySQL to be ready
         run: |
