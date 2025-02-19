@@ -1,7 +1,7 @@
 name: Continuous Integration of WEBAPP
 
 on:
-  pull_request:
+  pull_request_target:
     branches:
       - main
 
@@ -21,7 +21,7 @@ jobs:
 
       - name: Install Dependencies
         run: npm install
-        working-directory: ./src  # ✅ Run inside `src/`
+        working-directory: ./src  # ✅ Ensure `package.json` is in `src/`
 
       - name: Debug GitHub Secrets
         run: |
@@ -33,15 +33,15 @@ jobs:
         run: |
           echo "DATABASE_URL=mysql://${{ secrets.MYSQL_USER }}:${{ secrets.MYSQL_ROOT_PASSWORD }}@127.0.0.1:3306/${{ secrets.MYSQL_DATABASE }}" >> $GITHUB_ENV
           echo "PORT=${{ secrets.PORT }}" >> $GITHUB_ENV
-        working-directory: ./src  # ✅ Ensure it runs inside `src/`
+        working-directory: ./src  # ✅ Ensure env variables are available in `src/`
 
       - name: Run Database Migrations
-        run: node db.js
-        working-directory: ./src  # ✅ Ensure migrations run inside `src/`
+        run: node config/db.js  # ✅ Run db.js from `src/config/`
+        working-directory: ./src  # ✅ Ensure it runs inside `src/`
 
       - name: Run Tests
-        run: npm test -- --forceExit
-        working-directory: ./src  # ✅ Run tests inside `src/`
+        run: npm test -- Test/
+        working-directory: ./src  # ✅ Run tests inside `src/Test/`
         env:
           DATABASE_URL: ${{ env.DATABASE_URL }}
           PORT: ${{ env.PORT }}
