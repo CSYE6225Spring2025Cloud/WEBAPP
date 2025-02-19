@@ -67,6 +67,11 @@ jobs:
         run: node config/db.js  # ✅ Run db.js from `src/config/`
         working-directory: ./src  # ✅ Ensure it runs inside `src/`
 
+      - name: Storing relevant credentials in env of workflow
+        run: |
+          echo "DATABASE_URL=mysql://${{secrets.MYSQL_USER}}:${{secrets.MYSQL_ROOT_PASSWORD}}@127.0.0.1:3306/${{secrets.MYSQL_DATABASE}} " >> .env
+
+
       - name: Run Tests
         run: npm test -- Test/
         working-directory: ./src  # ✅ Run tests inside `src/Test/`
