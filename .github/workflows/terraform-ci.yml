@@ -73,3 +73,6 @@ jobs:
         env:
           DATABASE_URL: ${{ env.DATABASE_URL }}
           PORT: ${{ env.PORT }}
+
+      - name: Debug API Response
+        run: curl -i http://127.0.0.1:8080/healthz || echo "❌ API is not responding"
