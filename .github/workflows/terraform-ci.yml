@@ -42,11 +42,12 @@ jobs:
 
       - name: Configure Database & User
         run: |
-            sudo mysql -uroot -proot <<EOF
-            CREATE DATABASE IF NOT EXISTS ${{ secrets.MYSQL_DATABASE }};
-            mysql -e "CREATE USER IF NOT EXISTS '${{ secrets.MYSQL_USER }}'@'localhost' IDENTIFIED BY '${{ secrets.MYSQL_ROOT_PASSWORD }}';
-            mysql -e "GRANT ALL PRIVILEGES ON ${{ secrets.MYSQL_DATABASE }}.* TO '${{ secrets.MYSQL_USER }}'@'localhost';
-            mysql -e "FLUSH PRIVILEGES;
+          sudo mysql -u root -p${{ secrets.MYSQL_ROOT_PASSWORD }} <<EOF
+          CREATE DATABASE IF NOT EXISTS ${{ secrets.MYSQL_DATABASE }};
+          CREATE USER IF NOT EXISTS '${{ secrets.MYSQL_USER }}'@'localhost' IDENTIFIED BY '${{ secrets.MYSQL_ROOT_PASSWORD }}';
+          GRANT ALL PRIVILEGES ON ${{ secrets.MYSQL_DATABASE }}.* TO '${{ secrets.MYSQL_USER }}'@'localhost';
+          FLUSH PRIVILEGES;
+          EOF
 
 
       - name: Debug GitHub Secrets
