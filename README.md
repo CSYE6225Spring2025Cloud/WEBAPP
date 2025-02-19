@@ -1,7 +1,7 @@
 # WEBAPP
 
 # Health Check API
-testing take 80
+testing take api
 
 This is a simple **Health Check API** that allows monitoring the health of an application instance. The application is built using **Node.js**, **Express**, and **Sequelize** ORM, and it connects to a **MySQL** database.
 
@@ -118,4 +118,3 @@ cd <repository_folder>
       ```bash
       npm install --save-dev jest supertest
       ```      
- <!-- Branch 13 123 -->
