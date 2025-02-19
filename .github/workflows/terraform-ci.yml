@@ -9,7 +9,6 @@ jobs:
   build:
     name: Continuous Integration WEBAPP
     runs-on: ubuntu-latest
-    environment: dev
 
     services:
       mysql:
