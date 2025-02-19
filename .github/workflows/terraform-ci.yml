@@ -14,16 +14,17 @@ jobs:
       mysql:
         image: mysql:5.7
         env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}  # Ensure the root password is set
-          MYSQL_DATABASE: ${{ secrets.DB_NAME }}
-
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+          MYSQL_USER: ${{ secrets.MYSQL_USER }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping --silent"
+          --health-cmd="mysqladmin ping -h 127.0.0.1 --silent"
           --health-interval=10s
           --health-timeout=5s
-          --health-retries=3
+          --health-retries=5
 
     steps:
       - name: Checkout code
@@ -39,15 +40,18 @@ jobs:
 
       - name: Configure Environment Variables
         run: |
-          echo "DATABASE_URL=mysql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@${{ secrets.DB_HOST }}:3306/${{ secrets.DB_NAME }}" >> $GITHUB_ENV
+          echo "DATABASE_URL=mysql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@mysql:3306/${{ secrets.DB_NAME }}" >> $GITHUB_ENV
           echo "PORT=${{ secrets.PORT }}" >> $GITHUB_ENV
 
-      
       - name: Wait for MySQL to be ready
         run: |
-          until mysqladmin ping -h "${{ secrets.DB_HOST }}" --silent; do
-            echo "Waiting for MySQL to be ready..."
-            sleep 5
+          for i in {30..0}; do
+            if mysqladmin ping -h "127.0.0.1" --silent; then
+              echo "✅ MySQL is ready!"
+              break
+            fi
+            echo "⏳ Waiting for MySQL to start... ($i seconds remaining)"
+            sleep 2
           done
 
       - name: Run Database Migrations
