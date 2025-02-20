@@ -31,7 +31,7 @@ jobs:
       - name: Wait for MySQL to be ready
         run: |
           for i in {30..0}; do
-            if mysqladmin ping -h "127.0.0.1" --silent; then
+            if mysqladmin ping -h "localhost" --silent; then
               echo "✅ MySQL is ready!"
               break
             fi
@@ -44,8 +44,8 @@ jobs:
         run: |
           sudo mysql -u root -p${{ secrets.MYSQL_ROOT_PASSWORD }} <<EOF
           CREATE DATABASE IF NOT EXISTS ${{ secrets.MYSQL_DATABASE }};
-          CREATE USER IF NOT EXISTS '${{ secrets.MYSQL_USER }}'@'127.0.0.1' IDENTIFIED BY '${{ secrets.MYSQL_ROOT_PASSWORD }}';
-          GRANT ALL PRIVILEGES ON ${{ secrets.MYSQL_DATABASE }}.* TO '${{ secrets.MYSQL_USER }}'@'127.0.0.1';
+          CREATE USER IF NOT EXISTS '${{ secrets.MYSQL_USER }}'@'localhost' IDENTIFIED BY '${{ secrets.MYSQL_ROOT_PASSWORD }}';
+          GRANT ALL PRIVILEGES ON ${{ secrets.MYSQL_DATABASE }}.* TO '${{ secrets.MYSQL_USER }}'@'localhost';
           FLUSH PRIVILEGES;
           EOF
 
@@ -58,7 +58,7 @@ jobs:
 
       - name: Configure Environment Variables
         run: |
-          echo "DATABASE_URL=mysql://${{ secrets.MYSQL_USER }}:${{ secrets.MYSQL_ROOT_PASSWORD }}@127.0.0.1:3306/${{ secrets.MYSQL_DATABASE }}" >> $GITHUB_ENV
+          echo "DATABASE_URL=mysql://${{ secrets.MYSQL_USER }}:${{ secrets.MYSQL_ROOT_PASSWORD }}@localhost:3306/${{ secrets.MYSQL_DATABASE }}" >> $GITHUB_ENV
           echo "PORT=${{ secrets.PORT }}" >> $GITHUB_ENV
         working-directory: ./src  # ✅ Ensure env variables are available in `src/`
 
@@ -69,7 +69,7 @@ jobs:
 
       - name: Storing relevant credentials in env of workflow
         run: |
-          echo "DATABASE_URL=mysql://${{secrets.MYSQL_USER}}:${{secrets.MYSQL_ROOT_PASSWORD}}@127.0.0.1:3306/${{secrets.MYSQL_DATABASE}} " >> ./src/.env
+          echo "DATABASE_URL=mysql://${{secrets.MYSQL_USER}}:${{secrets.MYSQL_ROOT_PASSWORD}}@localhost:3306/${{secrets.MYSQL_DATABASE}} " >> ./src/.env
 
 
       - name: Run Tests
@@ -80,4 +80,4 @@ jobs:
           PORT: ${{ env.PORT }}
 
       - name: Debug API Response
-        run: curl -i http://127.0.0.1:8080/healthz || echo "❌ API is not responding"
+        run: curl -i http://localhost:8080/healthz || echo "❌ API is not responding"
