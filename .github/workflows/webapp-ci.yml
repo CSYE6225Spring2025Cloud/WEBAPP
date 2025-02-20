@@ -21,7 +21,7 @@ jobs:
 
       - name: Install Dependencies
         run: npm install
-        working-directory: ./src  # ✅ Ensure `package.json` is in `src/`
+        working-directory: ./src 
 
       - name: Start GitHub-Hosted MySQL
         run: |
@@ -32,7 +32,7 @@ jobs:
         run: |
           for i in {30..0}; do
             if mysqladmin ping -h "localhost" --silent; then
-              echo "✅ MySQL is ready!"
+              echo "MySQL is ready!"
               break
             fi
             echo "⏳ Waiting for MySQL to start... ($i seconds remaining)"
@@ -60,12 +60,12 @@ jobs:
         run: |
           echo "DATABASE_URL=mysql://${{ secrets.MYSQL_USER }}:${{ secrets.MYSQL_ROOT_PASSWORD }}@localhost:3306/${{ secrets.MYSQL_DATABASE }}" >> $GITHUB_ENV
           echo "PORT=${{ secrets.PORT }}" >> $GITHUB_ENV
-        working-directory: ./src  # ✅ Ensure env variables are available in `src/`
+        working-directory: ./src 
 
       
       - name: Run Database Migrations
-        run: node config/db.js  # ✅ Run db.js from `src/config/`
-        working-directory: ./src  # ✅ Ensure it runs inside `src/`
+        run: node config/db.js  
+        working-directory: ./src  
 
       - name: Storing relevant credentials in env of workflow
         run: |
@@ -74,10 +74,8 @@ jobs:
 
       - name: Run Tests
         run: npm test -- Test/
-        working-directory: ./src  # ✅ Run tests inside `src/Test/`
+        working-directory: ./src  
         env:
           DATABASE_URL: ${{ env.DATABASE_URL }}
           PORT: ${{ env.PORT }}
 
-      - name: Debug API Response
-        run: curl -i http://localhost:8080/healthz || echo "❌ API is not responding"
