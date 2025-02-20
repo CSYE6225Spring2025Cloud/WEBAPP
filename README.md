@@ -14,6 +14,7 @@ This is a simple **Health Check API** that allows monitoring the health of an ap
 ---
 
 
+
 ## **Prerequisites**
 Make sure the following are installed:
 1. **Node.js** (version ≥ 18.x)
