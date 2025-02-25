@@ -61,8 +61,8 @@ jobs:
           echo "DATABASE_URL=mysql://${{secrets.MYSQL_USER}}:${{secrets.MYSQL_ROOT_PASSWORD}}@localhost:3306/${{secrets.MYSQL_DATABASE}} " >> src/.env
         # working-directory: src
  
-      - name: Wait time
-        run: sleep 20
+      # - name: Wait time
+      #   run: sleep 20
  
       - name: Run Tests
         run: npm test 
