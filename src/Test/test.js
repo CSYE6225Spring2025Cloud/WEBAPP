@@ -14,9 +14,6 @@ describe("Health Check API (/healthz)", () => {
         await sequelize.authenticate(); // Ensure DB is connected before tests
     });
 
-    afterAll(async () => {
-        await sequelize.close(); // Close DB connection after tests
-    });
 
 
      //Test 1: Should return 200 OK when GET request is made without body/query params
@@ -76,4 +73,8 @@ describe("Health Check API (/healthz)", () => {
         expect(res.status).toBe(503);
     }); */
     
+    afterAll(async () => {
+        await sequelize.close(); // Close DB connection after tests
+    });
+
 });
