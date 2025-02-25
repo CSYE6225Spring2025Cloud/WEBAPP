@@ -11,7 +11,15 @@ console.log = jest.fn();
 describe("Health Check API (/healthz)", () => {
     
     beforeAll(async () => {
-        await sequelize.authenticate(); // Ensure DB is connected before tests
+        try{
+            await sequelize.authenticate(); // Ensure DB is connected before tests
+            await sequelize.sync({force:false});
+            console.log("Connection established successfully");
+        } catch (error)
+        {
+            console.error("Unable to connect");
+            throw error;
+        }
     });
 
 
