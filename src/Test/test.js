@@ -33,6 +33,7 @@ describe("Health Check API (/healthz)", () => {
          expect(res.status).toBe(200);
      }); */
     
+     
     test('Valid GET request to /healthz should return 200 OK', async () => {
         // Mock successful database insert
         //jest.spyOn(HealthCheck, 'create').mockResolvedValue({ id: 1, datetime: new Date() });
