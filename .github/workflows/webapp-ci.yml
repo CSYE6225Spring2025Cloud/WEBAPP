@@ -58,8 +58,8 @@ jobs:
  
       - name: Storing relevant credentials in env of workflow
         run: |
-          echo "DATABASE_URL=mysql://${{secrets.MYSQL_USER}}:${{secrets.MYSQL_ROOT_PASSWORD}}@localhost:3306/${{secrets.MYSQL_DATABASE}} " >> .env
-        working-directory: src
+          echo "DATABASE_URL=mysql://${{secrets.MYSQL_USER}}:${{secrets.MYSQL_ROOT_PASSWORD}}@localhost:3306/${{secrets.MYSQL_DATABASE}} " >> src/.env
+        # working-directory: src
  
       - name: Wait time
         run: sleep 20
