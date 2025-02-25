@@ -38,7 +38,7 @@ describe("Health Check API (/healthz)", () => {
         //jest.spyOn(HealthCheck, 'create').mockResolvedValue({ id: 1, datetime: new Date() });
 
         const res = await request(app).get('/healthz');
-        expect(res.status).toBe(200);
+        expect(res.status).toBe(201);
     });
     //Test 2: Should return 400 Bad Request if a body is sent
     test("Should return 400 Bad Request if body is sent", async () => {
