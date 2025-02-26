@@ -18,7 +18,7 @@ jobs:
         uses: hashicorp/setup-packer@v2
         with:
           packer_version: 'latest'
-          
+
       - name: Verify Packer Installation
         run: |
           packer --version
@@ -27,20 +27,23 @@ jobs:
       - name: Initialize Packer Plugins
         run: |
           echo "Initializing Packer plugins for source.pkr.hcl"
-          packer init packer/source.pkr.hcl
-          echo "Initializing Packer plugins for build.pkr.hcl"
-          packer init packer/build.pkr.hcl
+          packer init -upgrade packer/
+
+      - name: Packer Format Check  
+        run: |
+          echo "Running packer fmt to format HCL files..."
+          packer fmt -check -diff -recursive packer/
 
       - name: Run Packer Validate
         run: |
-          packer validate -syntax-only packer/source.pkr.hcl packer/build.pkr.hcl
+          packer validate packer/
 
-        continue-on-error: false
+        # continue-on-error: false
 
-      - name: Run Packer validate recursively
-        run: |
-          for file in $(find packer -name "*.pkr.hcl"); do
-            echo "Validating $file"
-            packer validate "$file" || (echo "Packer validation failed for $file." && exit 1)
-          done
-        continue-on-error: false
+      # - name: Run Packer validate recursively
+      #   run: |
+      #     for file in $(find packer -name "*.pkr.hcl"); do
+      #       echo "Validating $file"
+      #       packer validate "$file" || (echo "Packer validation failed for $file." && exit 1)
+      #     done
+      #   continue-on-error: false
