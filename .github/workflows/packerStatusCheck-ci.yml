@@ -28,7 +28,7 @@ jobs:
 
       - name: Run Packer Validate
         run: |
-          packer validate -syntax-onlypacker/source.pkr.hcl packer/build.pkr.hcl
+          packer validate -syntax-only packer/source.pkr.hcl packer/build.pkr.hcl
 
         continue-on-error: false
 
