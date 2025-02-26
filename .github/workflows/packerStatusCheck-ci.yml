@@ -28,8 +28,8 @@ jobs:
 
       - name: Run Packer Validate
         run: |
-          packer validate packer/source.pkr.hcl
-          packer validate packer/build.pkr.hcl
+          packer validate packer/source.pkr.hcl packer/build.pkr.hcl
+
         continue-on-error: false
 
       - name: Run Packer validate recursively
