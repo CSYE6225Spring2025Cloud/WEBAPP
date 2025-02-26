@@ -1,7 +1,7 @@
 name: Build Packer Custom Image
 
 on:
-  push:
+  pull_request:
     branches:
       - main
 
@@ -14,64 +14,76 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "20.x"
-
-      - name: Install Dependencies
-        run: npm install
-        working-directory: ./src
-
-      - name: Run Tests
-        run: npm test -- Test/
-        working-directory: ./src
-
-      - name: Build Application Artifact
+          node-version: '20'
+ 
+      - name: Enable mysql service
+        run: sudo systemctl start mysql
+ 
+      - name: Create .env File
         run: |
-          mkdir -p artifacts
-          zip -r artifacts/webapp.zip src/*
-        working-directory: .
-
+          echo "DATABASE_URL=mysql://${{secrets.MYSQL_USER}}:${{secrets.MYSQL_ROOT_PASSWORD}}@localhost:3306/${{secrets.MYSQL_DATABASE}} " >> src/.env
+ 
+      - name: Install Project Dependencies
+        run: npm install
+        working-directory: src
+ 
+      - name: Wait for MySQL to be Ready
+        run: |
+          echo "Waiting for MySQL to be ready..."
+          for i in {1..30}; do
+            if mysqladmin ping -h 127.0.0.1 --silent; then
+              echo "MySQL is ready!"
+              break
+            fi
+            echo "Waiting for MySQL..."
+            sleep 2
+          done
+ 
+      - name: Initialize MySQL Database as Root
+        run: |
+          sudo mysql -u"${{ secrets.MYSQL_USER }}" --password="${{ secrets.MYSQL_PASSWORD }}" <<EOF
+          CREATE DATABASE IF NOT EXISTS \`${{ secrets.MYSQL_DATABASE }}\`;
+          EOF
+ 
+      - name: Run Tests
+        run: npm test
+        env:
+         echo "DATABASE_URL=mysql://${{secrets.MYSQL_USER}}:${{secrets.MYSQL_ROOT_PASSWORD}}@localhost:3306/${{secrets.MYSQL_DATABASE}} " >> src/.env
+        working-directory: src
+ 
+      - name: Install Packer
+        uses: hashicorp/setup-packer@v2
+        
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ vars.AWS_REGION }}
-
-      - name: Configure GCP Credentials
+          aws-region: ${{ secrets.AWS_REGION }}
+          ami_users: ${{ secrets.AMI_USERS }}
+ 
+      - name: Authenticate with Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
-
-      - name: Setup Packer
-        uses: hashicorp/setup-packer@main
-        with:
-          packer_version: "1.10.2"
-
-      - name: Build Packer Image in AWS
+          credentials_json: "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}"
+ 
+      - name: Create JSON File from Secret
         run: |
-          cd packer
-          packer build \
-            -var "aws_region=${{ vars.AWS_REGION }}" \
-            -var "instance_type=${{ vars.INSTANCE_TYPE }}" \
-            -var "source_ami=${{ secrets.AWS_SOURCE_AMI }}" \
-            -var "mysql_database=${{ secrets.MYSQL_DATABASE }}" \
-            -var "mysql_user=${{ secrets.MYSQL_USER }}" \
-            -var "mysql_password=${{ secrets.MYSQL_PASSWORD }}" \
-            -var "app_port=${{ secrets.APP_PORT }}" \
-            build.pkr.hcl
+          echo '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}' | jq '.' > secret.json
+ 
+ 
+      - name: Initialize Packer Plugins
+        run: packer init -upgrade packer/
 
-      - name: Build Packer Image in GCP
+      - name: Build Custom Image
         run: |
-          cd packer
           packer build \
-            -var "gcp_project_id=${{ secrets.GCP_PROJECT_ID }}" \
-            -var "gcp_zone=${{ vars.GCP_ZONE }}" \
-            -var "machine_type=${{ secrets.MACHINE_TYPE }}" \
-            -var "mysql_database=${{ secrets.MYSQL_DATABASE }}" \
-            -var "mysql_user=${{ secrets.MYSQL_USER }}" \
-            -var "mysql_password=${{ secrets.MYSQL_PASSWORD }}" \
-            -var "app_port=${{ secrets.APP_PORT }}" \
-            build.pkr.hcl
+            -var "aws_region=${{ secrets.AWS_REGION }}" \
+            -var "DB_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" \
+            -var "instance_type=t2.micro" \
+            -var "ami_users=[\"${{ secrets.AMI_USERS }}\"]" \
+            -var "credentials_file=secret.json" \
+            packer/
