@@ -63,11 +63,10 @@ jobs:
           touch .env
           echo "DATABASE_URL=mysql://${{ secrets.MYSQL_USER }}:${{ secrets.MYSQL_ROOT_PASSWORD }}@localhost:3306/${{ secrets.MYSQL_DATABASE }}" >> .env
 
- 
-      - name: Wait time
-        run: sleep 20
- 
       - name: Run Tests
-        run: npm test -- Test/
-        working-directory: ./src  
+        working-directory: ./src
+        run: npm test
+        env:
+          DATABASE_URL: mysql://${{ secrets.MYSQL_USER }}:${{ secrets.MYSQL_ROOT_PASSWORD }}@localhost:3306/${{ secrets.MYSQL_DATABASE }}
+       
         

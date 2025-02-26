@@ -36,7 +36,10 @@ jobs:
 
       - name: Run Packer Validate
         run: |
-          packer validate packer/
+          packer validate\
+          -var "ami_users=[\"000000000000\"]" \
+          -var "credentials_file=secret.json" \ 
+          packer/
 
         # continue-on-error: false
 
