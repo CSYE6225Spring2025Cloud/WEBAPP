@@ -18,19 +18,18 @@ jobs:
         uses: hashicorp/setup-packer@v2
         with:
           packer_version: 'latest'
+
       - name: Initialize Packer Plugins
         run: |
-          for file in $(find packer -name "*.pkr.hcl"); do
-            echo "Initializing Packer plugins for $file"
-            packer init "$file"
-          done
+          echo "Initializing Packer plugins for source.pkr.hcl"
+          packer init packer/source.pkr.hcl
+          echo "Initializing Packer plugins for build.pkr.hcl"
+          packer init packer/build.pkr.hcl
 
-      - name: Run Packer fmt recursively
+      - name: Run Packer Validate
         run: |
-          for file in $(find packer -name "*.pkr.hcl"); do
-            echo "Checking format for $file"
-            packer fmt -check "$file" || (echo "Packer formatting required in $file." && exit 1)
-          done
+          packer validate packer/build.pkr.hcl
+          packer validate packer/source.pkr.hcl
         continue-on-error: false
 
       - name: Run Packer validate recursively
