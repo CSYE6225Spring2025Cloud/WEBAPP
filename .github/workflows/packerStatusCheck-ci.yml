@@ -18,6 +18,11 @@ jobs:
         uses: hashicorp/setup-packer@v2
         with:
           packer_version: 'latest'
+          
+      - name: Verify Packer Installation
+        run: |
+          packer --version
+          which packer
 
       - name: Initialize Packer Plugins
         run: |
