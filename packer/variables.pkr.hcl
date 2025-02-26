@@ -5,6 +5,7 @@ variable "aws_region" {
 
 variable "ami_users" {
   type = list(string)
+  default = ["123456789012"]  # Replace with actual AWS account ID(s)
 }
 
 variable "instance_type" {
@@ -19,14 +20,17 @@ variable "source_ami" {
 
 variable "mysql_database" {
   type = string
+  default = "mydatabase"
 }
 
 variable "mysql_user" {
   type = string
+  default = "myuser"
 }
 
 variable "mysql_password" {
   type = string
+  default = "mypassword"
 }
 
 variable "app_port" {
@@ -36,6 +40,7 @@ variable "app_port" {
 
 variable "repository_url" {
   type = string
+  default = "https://github.com/yourrepo.git"
 }
 
 variable "node_version" {
@@ -56,7 +61,7 @@ variable "project_name" {
 # GCP-specific variables
 variable "gcp_project_id" {
   type        = string
-  description = "Your Google Cloud Project ID."
+  default = "your-gcp-project-id"
 }
 
 variable "gcp_zone" {
