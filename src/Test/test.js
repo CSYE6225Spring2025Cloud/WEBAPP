@@ -23,8 +23,8 @@ describe("Health Check API (/healthz)", () => {
     });
 
 
-     //Test 1: Should return 200 OK when GET request is made without body/query params
-    /*   test("Should return 200 OK when called with GET and no body/query params", async () => {
+     ///Test 1: Should return 200 OK when GET request is made without body/query params
+     /*   test("Should return 200 OK when called with GET and no body/query params", async () => {
         const res = await request(app).get("/healthz");
         expect(res.status).toBe(200);
         expect(res.headers["x-content-type-options"]).toBe("nosniff");
@@ -32,9 +32,9 @@ describe("Health Check API (/healthz)", () => {
       }); */
 
 
-    /*  test('Valid GET request to /healthz should return 200 OK', async () => {
-        const res = await request(app).get('/healthz');
-        expect(res.status).toBe(200);
+       /*  test('Valid GET request to /healthz should return 200 OK', async () => {
+         const res = await request(app).get('/healthz');
+         expect(res.status).toBe(200);
      }); */
     
     test('Valid GET request to /healthz should return 200 OK', async () => {
