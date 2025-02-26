@@ -74,3 +74,7 @@ variable "machine_type" {
   type    = string
   default = "n1-standard-1"
 }
+
+variable "credentials_file" {
+  default = "development-creds.json"
+}

@@ -36,5 +36,6 @@ source "googlecompute" "gcp_webapp_ami" {
   image_description       = "Custom Ubuntu 20.04 server image"
   image_storage_locations = ["us"]
   image_family            = "csye6225-custom-ami"
+  credentials_file        = var.credentials_file
 
 }
