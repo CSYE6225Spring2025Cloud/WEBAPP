@@ -4,7 +4,7 @@ variable "aws_region" {
 }
 
 variable "ami_users" {
-  type    = list(string)
+  type = list(string)
 }
 
 variable "instance_type" {
@@ -65,7 +65,7 @@ variable "gcp_zone" {
 }
 
 
-variable "machine_type"{
-  type        = string
-  default     = "n1-standard-1"
+variable "machine_type" {
+  type    = string
+  default = "n1-standard-1"
 }
