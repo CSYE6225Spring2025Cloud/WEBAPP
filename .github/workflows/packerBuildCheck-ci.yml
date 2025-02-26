@@ -48,12 +48,19 @@ jobs:
           CREATE DATABASE IF NOT EXISTS \`${{ secrets.MYSQL_DATABASE }}\`;
           EOF
  
+      - name: Create and Set Environment Variables
+        shell: bash
+        working-directory: ./src
+        run: |
+          touch .env
+          echo "DATABASE_URL=mysql://${{ secrets.MYSQL_USER }}:${{ secrets.MYSQL_ROOT_PASSWORD }}@localhost:3306/${{ secrets.MYSQL_DATABASE }}" >> .env
+
       - name: Run Tests
+        working-directory: ./src
         run: npm test
         env:
-          echo "DATABASE_URL=mysql://${{secrets.MYSQL_USER}}:${{secrets.MYSQL_ROOT_PASSWORD}}@localhost:3306/${{secrets.MYSQL_DATABASE}} " >> .env
-        working-directory: ./src
- 
+          DATABASE_URL: mysql://${{ secrets.MYSQL_USER }}:${{ secrets.MYSQL_ROOT_PASSWORD }}@localhost:3306/${{ secrets.MYSQL_DATABASE }}
+     
       - name: Install Packer
         uses: hashicorp/setup-packer@v2
         
