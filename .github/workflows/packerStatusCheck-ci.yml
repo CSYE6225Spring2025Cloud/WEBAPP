@@ -18,6 +18,12 @@ jobs:
         uses: hashicorp/setup-packer@v2
         with:
           packer_version: 'latest'
+      - name: Initialize Packer Plugins
+        run: |
+          for file in $(find packer -name "*.pkr.hcl"); do
+            echo "Initializing Packer plugins for $file"
+            packer init "$file"
+          done
 
       - name: Run Packer fmt recursively
         run: |
