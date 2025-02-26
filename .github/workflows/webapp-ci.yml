@@ -56,10 +56,13 @@ jobs:
           echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}"
           echo "MYSQL_ROOT_PASSWORD is set (masked for security)"
  
-      - name: Storing relevant credentials in env of workflow
-        run: |
-          echo "DATABASE_URL=mysql://${{secrets.MYSQL_USER}}:${{secrets.MYSQL_ROOT_PASSWORD}}@localhost:3306/${{secrets.MYSQL_DATABASE}} " >> .env
+      - name: Create and Set Environment Variables
+        shell: bash
         working-directory: ./src
+        run: |
+          touch .env
+          echo "DATABASE_URL=mysql://${{ secrets.MYSQL_USER }}:${{ secrets.MYSQL_ROOT_PASSWORD }}@localhost:3306/${{ secrets.MYSQL_DATABASE }}" >> .env
+
  
       - name: Wait time
         run: sleep 20
