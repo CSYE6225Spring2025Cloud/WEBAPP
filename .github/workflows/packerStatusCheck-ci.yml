@@ -1,0 +1,36 @@
+name: Continuous Integration of WEBAPP
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  packer:
+    name: Packer Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Packer
+        uses: hashicorp/setup-packer@v2
+        with:
+          packer_version: 'latest'
+
+      - name: Run Packer fmt recursively
+        run: |
+          for file in $(find packer -name "*.pkr.hcl"); do
+            echo "Checking format for $file"
+            packer fmt -check "$file" || (echo "Packer formatting required in $file." && exit 1)
+          done
+        continue-on-error: false
+
+      - name: Run Packer validate recursively
+        run: |
+          for file in $(find packer -name "*.pkr.hcl"); do
+            echo "Validating $file"
+            packer validate "$file" || (echo "Packer validation failed for $file." && exit 1)
+          done
+        continue-on-error: false
