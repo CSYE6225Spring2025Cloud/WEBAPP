@@ -51,7 +51,7 @@ jobs:
       - name: Run Tests
         run: npm test
         env:
-         echo "DATABASE_URL=mysql://${{secrets.MYSQL_USER}}:${{secrets.MYSQL_ROOT_PASSWORD}}@localhost:3306/${{secrets.MYSQL_DATABASE}} " >> src/.env
+          echo "DATABASE_URL=mysql://${{secrets.MYSQL_USER}}:${{secrets.MYSQL_ROOT_PASSWORD}}@localhost:3306/${{secrets.MYSQL_DATABASE}} " >> src/.env
         working-directory: src
  
       - name: Install Packer
