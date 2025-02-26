@@ -8,13 +8,18 @@ const sequelize = require('../config/db');
 console.error = jest.fn();
 console.log = jest.fn();
 
-describe("Health Check API (/healthz)", () => {
+describe("Health Check API (/healthz)", async () => {
     
-    beforeAll(async () => {
-        await sequelize.authenticate(); // Ensure DB is connected before tests
-    });
-
+    try {
+        await sequelize.authenticate(); // Ensure connection is valid
+        console.log('Database connected successfully!');
     
+        await sequelize.sync({ alter: true }); // Sync database
+        console.log('Database synced!');
+    
+      } catch (error) {
+        console.error('Error connecting to database:', error);
+      }
 
 
      //Test 1: Should return 200 OK when GET request is made without body/query params
@@ -34,7 +39,6 @@ describe("Health Check API (/healthz)", () => {
     test('Valid GET request to /healthz should return 200 OK', async () => {
         // Mock successful database insert
         jest.spyOn(HealthCheck, 'create').mockResolvedValue({ id: 1, datetime: new Date() });
-
         const res = await request(app).get('/healthz');
         expect(res.status).toBe(200);
     });
