@@ -21,17 +21,17 @@ source "amazon-ebs" "webapp_ami" {
 }
 
 source "googlecompute" "gcp_webapp_ami" {
-  project_id   = var.gcp_project_id
-  zone         = var.gcp_zone
-  machine_type = var.machine_type
+  project_id              = var.gcp_project_id
+  zone                    = var.gcp_zone
+  machine_type            = var.machine_type
   source_image            = "ubuntu-2404-noble-amd64-v20250214"
   source_image_family     = "ubuntu-2404-noble-amd64"
-  ssh_username = var.ssh_username
+  ssh_username            = var.ssh_username
   disk_size               = 10
   disk_type               = "pd-standard"
   network                 = "default"
   tags                    = ["csye6225"]
-  image_name   = "${var.project_name}-gcp-ami-{{timestamp}}"
+  image_name              = "${var.project_name}-gcp-ami-{{timestamp}}"
   image_project_id        = var.gcp_project_id
   image_description       = "Custom Ubuntu 20.04 server image"
   image_storage_locations = ["us"]
