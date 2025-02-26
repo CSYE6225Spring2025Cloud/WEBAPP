@@ -8,18 +8,19 @@ const sequelize = require('../config/db');
 console.error = jest.fn();
 console.log = jest.fn();
 
-describe("Health Check API (/healthz)", async () => {
+describe("Health Check API (/healthz)", () => {
     
-    try {
-        await sequelize.authenticate(); // Ensure connection is valid
-        console.log('Database connected successfully!');
-    
-        await sequelize.sync({ alter: true }); // Sync database
-        console.log('Database synced!');
-    
-      } catch (error) {
-        console.error('Error connecting to database:', error);
-      }
+    beforeAll(async () => {
+        try {
+            await sequelize.authenticate(); // Ensure connection is valid
+            console.log('Database connected successfully!');
+
+            await sequelize.sync({ alter: true }); // Sync database
+            console.log('Database synced!');
+        } catch (error) {
+            console.error('Error connecting to database:', error);
+        }
+    });
 
 
      //Test 1: Should return 200 OK when GET request is made without body/query params
