@@ -89,7 +89,7 @@ jobs:
         run: |
           packer build \
             -var "aws_region=${{ secrets.AWS_REGION }}" \
-            -var "DB_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" \
+            -var "mysql_password=${{ secrets.MYSQL_ROOT_PASSWORD }}" \
             -var "instance_type=t2.micro" \
             -var "ami_users=[\"${{ secrets.AMI_USERS }}\"]" \
             -var "credentials_file=secret.json" \
