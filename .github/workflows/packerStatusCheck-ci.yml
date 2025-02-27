@@ -1,4 +1,4 @@
-name: Continuous Integration of WEBAPP
+name: Packer Status Check
 
 on:
   pull_request:
@@ -46,13 +46,3 @@ jobs:
           -var "gcp_project_id=${{ secrets.GCP_PROJECT_ID }}" \
           packer/
 
-
-        # continue-on-error: false
-
-      # - name: Run Packer validate recursively
-      #   run: |
-      #     for file in $(find packer -name "*.pkr.hcl"); do
-      #       echo "Validating $file"
-      #       packer validate "$file" || (echo "Packer validation failed for $file." && exit 1)
-      #     done
-      #   continue-on-error: false

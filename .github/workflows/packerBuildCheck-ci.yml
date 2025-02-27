@@ -2,11 +2,14 @@ name: Build Packer Custom Image
 
 on:
   pull_request:
+    types:
+      - closed
     branches:
       - main
 
 jobs:
   build-and-deploy:
+    if: github.event.pull_request.merged == true
     name: Build and Deploy Custom Image
     runs-on: ubuntu-latest
     
