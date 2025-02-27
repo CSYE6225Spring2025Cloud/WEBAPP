@@ -22,10 +22,13 @@ jobs:
       - name: Enable mysql service
         run: sudo systemctl start mysql
  
-      - name: Create .env File
+      - name: Create and Set Environment Variables
+        shell: bash
+        working-directory: ./src
         run: |
-          echo "DATABASE_URL=mysql://${{secrets.MYSQL_USER}}:${{secrets.MYSQL_ROOT_PASSWORD}}@localhost:3306/${{secrets.MYSQL_DATABASE}} " >> src/.env
- 
+          touch .env
+          echo "DATABASE_URL=mysql://${{ secrets.MYSQL_USER }}:${{ secrets.MYSQL_ROOT_PASSWORD }}@localhost:3306/${{ secrets.MYSQL_DATABASE }}" >> .env
+
       - name: Install Project Dependencies
         run: npm install
         working-directory: src
@@ -48,12 +51,6 @@ jobs:
           CREATE DATABASE IF NOT EXISTS \`${{ secrets.MYSQL_DATABASE }}\`;
           EOF
  
-      - name: Create and Set Environment Variables
-        shell: bash
-        working-directory: ./src
-        run: |
-          touch .env
-          echo "DATABASE_URL=mysql://${{ secrets.MYSQL_USER }}:${{ secrets.MYSQL_ROOT_PASSWORD }}@localhost:3306/${{ secrets.MYSQL_DATABASE }}" >> .env
 
       - name: Run Tests
         working-directory: ./src
