@@ -20,7 +20,7 @@ source "amazon-ebs" "webapp_ami" {
   ami_name      = "${var.project_name}-aws-ami-{{timestamp}}"
 }
 
-source "googlecompute" "gcp_webapp_ami" {
+source "googlecompute" "gcp_webapp" {
   project_id              = var.gcp_project_id
   zone                    = var.gcp_zone
   machine_type            = var.machine_type
@@ -31,11 +31,11 @@ source "googlecompute" "gcp_webapp_ami" {
   disk_type               = "pd-standard"
   network                 = "default"
   tags                    = ["csye6225"]
-  image_name              = "${var.project_name}-gcp-ami-{{timestamp}}"
+  image_name              = "${var.project_name}-gcp"
   image_project_id        = var.gcp_project_id
   image_description       = "Custom Ubuntu 20.04 server image"
   image_storage_locations = ["us"]
-  image_family            = "csye6225-custom-ami"
+  image_family            = "csye6225-custom"
   credentials_file        = var.credentials_file
 
 }
