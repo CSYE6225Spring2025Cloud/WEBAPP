@@ -25,12 +25,12 @@ variable "mysql_database" {
 
 variable "mysql_user" {
   type    = string
-  default = "myuser"
+  default = "root"
 }
 
 variable "mysql_password" {
   type    = string
-  default = "mypassword"
+  default = "root"
 }
 
 variable "app_port" {
