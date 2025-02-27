@@ -23,6 +23,7 @@ jobs:
         run: |
           packer --version
           which packer
+
       - name: Create JSON File from Secret
         run: |
           echo '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}' | jq '.' > secret.json
@@ -41,8 +42,9 @@ jobs:
         run: |
           packer validate \
           -var "ami_users=[\"000000000000\"]" \
-          -var "credentials_file=secret.json" \ 
+          -var "credentials_file=secret.json" \
           packer/
+
 
         # continue-on-error: false
 
