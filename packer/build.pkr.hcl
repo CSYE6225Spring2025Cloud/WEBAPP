@@ -1,5 +1,5 @@
 build {
-  sources = ["source.amazon-ebs.webapp_ami", "source.googlecompute.gcp_webapp_ami"]
+  sources = ["source.amazon-ebs.webapp_ami", "source.googlecompute.gcp_webapp"]
 
   # Copy the src/ directory to the instance
   provisioner "file" {
