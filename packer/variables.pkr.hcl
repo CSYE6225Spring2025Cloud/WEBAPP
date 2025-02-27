@@ -28,6 +28,11 @@ variable "mysql_user" {
   default = "root"
 }
 
+variable "mysql_password" {
+  type    = string
+  default = "Your root password"
+}
+
 
 variable "app_port" {
   type    = string
