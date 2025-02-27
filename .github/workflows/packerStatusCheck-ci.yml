@@ -26,7 +26,7 @@ jobs:
       - name: Create JSON File from Secret
         run: |
           echo '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}' | jq '.' > secret.json
-          
+
       - name: Initialize Packer Plugins
         run: |
           echo "Initializing Packer plugins for source.pkr.hcl"
@@ -39,7 +39,7 @@ jobs:
 
       - name: Run Packer Validate
         run: |
-          packer validate\
+          packer validate \
           -var "ami_users=[\"000000000000\"]" \
           -var "credentials_file=secret.json" \ 
           packer/
