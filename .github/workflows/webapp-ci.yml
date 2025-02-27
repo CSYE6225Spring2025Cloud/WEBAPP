@@ -26,7 +26,6 @@ jobs:
           touch .env
           echo "DATABASE_URL=mysql://${{ secrets.MYSQL_USER }}:${{ secrets.MYSQL_ROOT_PASSWORD }}@localhost:3306/${{ secrets.MYSQL_DATABASE }}" >> .env
 
- 
       - name: Install Dependencies
         run: npm install
         working-directory: ./src
@@ -34,20 +33,26 @@ jobs:
       - name: Start GitHub-Hosted MySQL
         run: |
           sudo systemctl start mysql
-          sudo systemctl status mysql
-      
+          sudo systemctl status mysql || true  # Ignore errors in status check
+
       - name: Wait for MySQL to be ready
         run: |
+          echo "Waiting for MySQL to be ready..."
           for i in {30..0}; do
             if mysqladmin ping -h "localhost" --silent; then
-              echo "MySQL is ready!"
+              echo "✅ MySQL is ready!"
               break
             fi
             echo "⏳ Waiting for MySQL to start... ($i seconds remaining)"
             sleep 2
           done
- 
- 
+
+          # Final Check: If MySQL is still not responding, fail the job
+          if ! mysqladmin ping -h "localhost" --silent; then
+            echo "❌ MySQL did not start in time."
+            exit 1
+          fi
+
       - name: Configure Database & User
         run: |
           sudo mysql -uroot -proot <<EOF
@@ -57,17 +62,13 @@ jobs:
           FLUSH PRIVILEGES;
           EOF
  
- 
-      - name: Debug GitHub Secrets
+      - name: Debug Database Connection
         run: |
-          echo "MYSQL_USER=${{ secrets.MYSQL_USER }}"
-          echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}"
-          echo "MYSQL_ROOT_PASSWORD is set (masked for security)"
- 
+          echo "Checking MySQL connection using credentials from GitHub Secrets..."
+          mysql -u${{ secrets.MYSQL_USER }} -p${{ secrets.MYSQL_ROOT_PASSWORD }} -e "SHOW DATABASES;"
+
       - name: Run Tests
         working-directory: ./src
         run: npm test
         env:
           DATABASE_URL: mysql://${{ secrets.MYSQL_USER }}:${{ secrets.MYSQL_ROOT_PASSWORD }}@localhost:3306/${{ secrets.MYSQL_DATABASE }}
-       
-        
