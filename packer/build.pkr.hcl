@@ -3,7 +3,7 @@ build {
 
   # Copy the src/ directory to the instance
   provisioner "file" {
-    source      = "./src"
+    source      = "./src
     destination = "/tmp/app"
   }
 
