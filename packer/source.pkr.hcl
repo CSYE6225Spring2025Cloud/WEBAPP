@@ -21,7 +21,7 @@ source "amazon-ebs" "webapp_ami" {
 }
 
 source "googlecompute" "gcp_webapp" {
-  # project_id              = var.gcp_project_id
+  project_id              = var.gcp_project_id
   zone                    = var.gcp_zone
   machine_type            = var.machine_type
   source_image            = "ubuntu-2404-noble-amd64-v20250214"
