@@ -23,6 +23,8 @@ router.post('/v1/file', validateFileUpload, uploadFile);
 router.get('/v1/file/:id', getFile);
 router.delete('/v1/file/:id', deleteFile);
 
+router.get('/v1/file', (req, res) => res.status(400).send());
+router.delete('/v1/file', (req, res) => res.status(400).send());
 
 const methodNotAllowed = (req, res) => {
     res.status(405).end();
