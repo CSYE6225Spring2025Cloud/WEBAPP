@@ -24,9 +24,9 @@ jobs:
           packer --version
           which packer
 
-      - name: Create JSON File from Secret
-        run: |
-          echo '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}' | jq '.' > secret.json
+      # - name: Create JSON File from Secret
+      #   run: |
+      #     echo '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}' | jq '.' > secret.json
 
       - name: Initialize Packer Plugins
         run: |
@@ -43,7 +43,5 @@ jobs:
           packer validate \
           -var "mysql_password=${{ secrets.MYSQL_ROOT_PASSWORD }}" \
           -var "ami_users=[\"000000000000\"]" \
-          -var "credentials_file=secret.json" \
-          -var "gcp_project_id=${{ secrets.GCP_PROJECT_ID }}" \
           packer/
 
