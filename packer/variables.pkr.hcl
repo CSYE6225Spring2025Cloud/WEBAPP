@@ -59,23 +59,23 @@ variable "project_name" {
   default = "csye6225"
 }
 
-# GCP-specific variables
-variable "gcp_project_id" {
-  type    = string
-  default = "your-gcp-project-id"
-}
+# # GCP-specific variables
+# variable "gcp_project_id" {
+#   type    = string
+#   default = "your-gcp-project-id"
+# }
 
-variable "gcp_zone" {
-  type    = string
-  default = "us-east1-d"
-}
+# variable "gcp_zone" {
+#   type    = string
+#   default = "us-east1-d"
+# }
 
 
-variable "machine_type" {
-  type    = string
-  default = "n1-standard-1"
-}
+# variable "machine_type" {
+#   type    = string
+#   default = "n1-standard-1"
+# }
 
-variable "credentials_file" {
-  default = "development-creds.json"
-}
+# variable "credentials_file" {
+#   default = "development-creds.json"
+# }
