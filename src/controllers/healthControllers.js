@@ -1,4 +1,4 @@
-const HealthCheck = require("../models")
+const { HealthCheck } = require("../models")
 
 const healthCheck = async (req, res) => {
   try {
