@@ -4,6 +4,8 @@ const { uploadFile, getFile, deleteFile } = require('../controllers/fileControll
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() }).single('file');
+const logger = require('../logger');
+
 
 
 const validateFileUpload = (req, res, next) => {
@@ -27,7 +29,8 @@ router.get('/v1/file', (req, res) => res.status(400).send());
 router.delete('/v1/file', (req, res) => res.status(400).send());
 
 const methodNotAllowed = (req, res) => {
-    res.status(405).end();
+        logger.warn(`405 Method Not Allowed - ${req.method} ${req.originalUrl}`);
+        res.status(405).end();
 };
 
 
