@@ -8,6 +8,16 @@ build {
     destination = "/tmp/app"
   }
 
+# Copy CloudWatch Agent config file to the instance
+provisioner "file" {
+  source      = "./packer/cloudwatch-config.json"  # or wherever you place it
+  destination = "/tmp/cloudwatch-config.json"
+}
+# You must add this block to upload your script:
+provisioner "file" {
+  source      = "./script/cloudwatch-setup.sh"
+  destination = "/tmp/cloudwatch-setup.sh"
+}
   # Provision the instance and create .env dynamically
   provisioner "shell" {
     inline = [
@@ -57,7 +67,11 @@ build {
       "sudo systemctl daemon-reload",
       "sudo systemctl enable csye6225.service",
 
-      "echo 'Setup completed successfully!'"
+      "echo 'Setup completed successfully!'",
+
+      # Install and configure CloudWatch agent
+      "chmod +x /tmp/cloudwatch-setup.sh",
+      "sudo /tmp/cloudwatch-setup.sh",
     ]
   }
 }

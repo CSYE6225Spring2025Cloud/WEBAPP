@@ -1,0 +1,13 @@
+aws_region     = "us-east-1"
+ami_users      = ["585768152307"] # Replace with actual AWS account IDs
+ssh_username   = "ubuntu"
+instance_type  = "t2.micro"
+project_name   = "csye6225"
+mysql_database = "HealthChecks"
+mysql_user     = "root"
+app_port       = "8080"
+mysql_password = "root"
+repository_url = "https://github.com/your/repository.git"
+# node_version   = "20.x"
+# machine_type   = "n1-standard-1"
+# gcp_project_id = "devproject-452007"
