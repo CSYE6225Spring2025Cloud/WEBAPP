@@ -148,6 +148,7 @@ jobs:
             exit 1
           fi
           echo "Latest Launch Template Version: $LATEST_VERSION"
+          echo "latest-version=$LATEST_VERSION" >> $GITHUB_OUTPUT
 
       # Step 3: Create New Launch Template Version with Latest AMI
       - name: Create Launch Template Version
