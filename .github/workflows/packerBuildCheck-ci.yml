@@ -12,7 +12,7 @@ jobs:
     # if: github.event.pull_request.merged == true
     name: Build and Deploy Custom Image
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -21,10 +21,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20'
- 
+
       - name: Enable mysql service
         run: sudo systemctl start mysql
- 
+
       - name: Create and Set Environment Variables
         shell: bash
         working-directory: ./src
@@ -35,7 +35,7 @@ jobs:
       - name: Install Project Dependencies
         run: npm install
         working-directory: src
- 
+
       - name: Wait for MySQL to be Ready
         run: |
           echo "Waiting for MySQL to be ready..."
@@ -47,23 +47,22 @@ jobs:
             echo "Waiting for MySQL..."
             sleep 2
           done
- 
+
       - name: Initialize MySQL Database as Root
         run: |
           sudo mysql -u"${{ secrets.MYSQL_USER }}" --password="${{ secrets.MYSQL_PASSWORD }}" <<EOF
           CREATE DATABASE IF NOT EXISTS \`${{ secrets.MYSQL_DATABASE }}\`;
           EOF
- 
 
       - name: Run Tests
         working-directory: ./src
         run: npm test
         env:
           DATABASE_URL: mysql://${{ secrets.MYSQL_USER }}:${{ secrets.MYSQL_ROOT_PASSWORD }}@localhost:3306/${{ secrets.MYSQL_DATABASE }}
-     
+
       - name: Install Packer
         uses: hashicorp/setup-packer@v2
-        
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -71,17 +70,16 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
           ami_users: ${{ secrets.AMI_USERS }}
- 
+
       # - name: Authenticate with Google Cloud
       #   uses: google-github-actions/auth@v2
       #   with:
       #     credentials_json: "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}"
- 
+
       # - name: Create JSON File from Secret
       #   run: |
       #     echo '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}' | jq '.' > secret.json
- 
- 
+
       - name: Initialize Packer Plugins
         run: packer init -upgrade packer/
 
@@ -94,7 +92,6 @@ jobs:
             -var "ami_users=[\"${{ secrets.AMI_USERS }}\"]" \
             packer/
 
-
       - name: Configure AWS Credentials (DEMO) 
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -102,40 +99,116 @@ jobs:
           aws-secret-access-key: ${{ secrets.DEMO_AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Update Launch Template with New AMI
+      # Step 2: Find Launch Template ID Dynamically
+      - name: Find Launch Template ID
+        id: update-lt
         run: |
-          AMI_ID=$(aws ec2 describe-images --owners self --query 'Images[-1].ImageId' --output text)
-          LATEST_VERSION=$(aws ec2 create-launch-template-version \
-            --launch-template-id ${{ secrets.LAUNCH_TEMPLATE_ID }} \
-            --source-version 1 \
-            --launch-template-data "{\"ImageId\":\"$AMI_ID\"}" \
-            --query 'LaunchTemplateVersion.VersionNumber' --output text)
+          echo "Looking for Launch Template with prefix: ${{ secrets.LAUNCH_TEMPLATE_PREFIX }}"
+          LAUNCH_TEMPLATE_ID=$(aws ec2 describe-launch-templates \
+            --filters "Name=launch-template-name,Values=${{ secrets.LAUNCH_TEMPLATE_PREFIX }}*" \
+            --query "LaunchTemplates[0].LaunchTemplateId" \
+            --output text)
 
-          aws autoscaling update-auto-scaling-group \
-            --auto-scaling-group-name ${{ secrets.ASG_NAME }} \
-            --launch-template "LaunchTemplateId=${{ secrets.LAUNCH_TEMPLATE_ID }},Version=$LATEST_VERSION"
-
-      - name: Start Instance Refresh
-        id: refresh
-        run: |
-          REFRESH_ID=$(aws autoscaling start-instance-refresh \
-            --auto-scaling-group-name ${{ secrets.ASG_NAME }} \
-            --query 'InstanceRefreshId' --output text)
-          echo "refresh_id=$REFRESH_ID" >> $GITHUB_OUTPUT
-
-      - name: Wait for Instance Refresh
-        run: |
-          STATUS="InProgress"
-          while [[ "$STATUS" == "InProgress" ]]; do
-            sleep 30
-            STATUS=$(aws autoscaling describe-instance-refreshes \
-              --auto-scaling-group-name ${{ secrets.ASG_NAME }} \
-              --query 'InstanceRefreshes[0].Status' --output text)
-            echo "Refresh status: $STATUS"
-          done
-
-          if [[ "$STATUS" != "Successful" ]]; then
-            echo "Instance refresh failed."
+          if [ -z "$LAUNCH_TEMPLATE_ID" ] || [ "$LAUNCH_TEMPLATE_ID" == "None" ]; then
+            echo "❌ Launch Template not found."
             exit 1
           fi
 
+          echo "✅ Launch Template ID: $LAUNCH_TEMPLATE_ID"
+          echo "launch-template-id=$LAUNCH_TEMPLATE_ID" >> $GITHUB_OUTPUT
+
+      # Step 3: Create New Launch Template Version with Latest AMI
+      - name: Create Launch Template Version
+        id: lt-version
+        run: |
+          echo "Creating new version for Launch Template: ${{ steps.update-lt.outputs.launch-template-id }}"
+          NEW_VERSION=$(aws ec2 create-launch-template-version \
+            --launch-template-id "${{ steps.update-lt.outputs.launch-template-id }}" \
+            --source-version 1 \
+            --launch-template-data "{\"ImageId\":\"${{ steps.build-ami.outputs.ami-id }}\"}" \
+            --query "LaunchTemplateVersion.VersionNumber" \
+            --output text)
+
+          if [ -z "$NEW_VERSION" ]; then
+            echo "❌ Failed to create new launch template version"
+            exit 1
+          fi
+
+          echo "✅ New Launch Template Version: $NEW_VERSION"
+          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      # Step 4: Set New Version as Default in Launch Template
+      - name: Set Default Launch Template Version
+        run: |
+          echo "Setting new version as default..."
+          aws ec2 modify-launch-template \
+            --launch-template-id "${{ steps.update-lt.outputs.launch-template-id }}" \
+            --default-version "${{ steps.lt-version.outputs.version }}"
+
+      # Step 5: Find Auto Scaling Group Name (Optional if hardcoded)
+      - name: Get Auto Scaling Group Name
+        id: find-asg
+        run: |
+          echo "Searching for ASG with prefix: ${{ secrets.ASG_PREFIX }}"
+          ASG_NAME=$(aws autoscaling describe-auto-scaling-groups \
+            --query "AutoScalingGroups[?starts_with(AutoScalingGroupName, '${{ secrets.ASG_PREFIX }}')].AutoScalingGroupName" \
+            --output text)
+
+          if [ -z "$ASG_NAME" ]; then
+            echo "❌ Auto Scaling Group not found!"
+            exit 1
+          fi
+
+          echo "✅ ASG Name: $ASG_NAME"
+          echo "asg-name=$ASG_NAME" >> $GITHUB_OUTPUT
+
+      # Step 6: Update Auto Scaling Group to Use New Launch Template Version
+      - name: Update Auto Scaling Group
+        run: |
+          echo "Updating ASG to use new Launch Template version..."
+          aws autoscaling update-auto-scaling-group \
+            --auto-scaling-group-name "${{ steps.find-asg.outputs.asg-name }}" \
+            --launch-template "LaunchTemplateId=${{ steps.update-lt.outputs.launch-template-id }},Version=${{ steps.lt-version.outputs.version }}"
+
+      # Step 7: Trigger Instance Refresh
+      - name: Start Instance Refresh
+        id: refresh
+        run: |
+          echo "Starting instance refresh on ASG..."
+          REFRESH_ID=$(aws autoscaling start-instance-refresh \
+            --auto-scaling-group-name "${{ steps.find-asg.outputs.asg-name }}" \
+            --preferences '{"MinHealthyPercentage": 90}' \
+            --query "InstanceRefreshId" \
+            --output text)
+
+          if [ -z "$REFRESH_ID" ]; then
+            echo "❌ Failed to start instance refresh"
+            exit 1
+          fi
+
+          echo "✅ Instance Refresh ID: $REFRESH_ID"
+          echo "InstanceRefreshId=$REFRESH_ID" >> $GITHUB_OUTPUT
+
+      # Step 8: Wait for Instance Refresh Completion
+      - name: Wait for Instance Refresh
+        run: |
+          echo "Waiting for Instance Refresh to complete..."
+          while true; do
+            STATUS=$(aws autoscaling describe-instance-refreshes \
+              --auto-scaling-group-name "${{ steps.find-asg.outputs.asg-name }}" \
+              --instance-refresh-ids "${{ steps.refresh.outputs.InstanceRefreshId }}" \
+              --query 'InstanceRefreshes[0].Status' \
+              --output text)
+
+            echo "🔄 Current refresh status: $STATUS"
+
+            if [ "$STATUS" == "Successful" ]; then
+              echo "✅ Refresh completed successfully."
+              break
+            elif [ "$STATUS" == "Failed" ]; then
+              echo "❌ Refresh failed."
+              exit 1
+            fi
+
+            sleep 30
+          done
