@@ -92,12 +92,12 @@ jobs:
             -var "instance_type=t2.micro" \
             -var "ami_users=[\"${{ secrets.AMI_USERS }}\"]" \
             packer/ | grep -o 'ami-[0-9a-f]\{17\}' | tail -n 1)
-          if [ -z "$AMI_ID" ]; then
+          if [ -z "$AMI_OUTPUT" ]; then
             echo "Error: Failed to extract AMI ID from Packer output."
             exit 1
           fi
     
-          echo "✅ Built AMI ID: $AMI_OUTPUT"
+          echo "Built AMI ID: $AMI_OUTPUT"
           echo "ami-id=$AMI_OUTPUT" >> $GITHUB_OUTPUT
 
       # - name: Build Custom Image
