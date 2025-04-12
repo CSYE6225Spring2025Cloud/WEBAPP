@@ -92,7 +92,10 @@ jobs:
             -var "mysql_password=${{ secrets.MYSQL_ROOT_PASSWORD }}" \
             -var "instance_type=t2.micro" \
             -var "ami_users=[\"${{ secrets.AMI_USERS }}\"]" \
-            packer/ | tee /dev/tty | grep 'artifact,0,id' | cut -d, -f6 | cut -d: -f2)
+            packer/ | grep -o 'ami-[0-9a-f]\{17\}' | tail -n 1)
+          if [ -z "$AMI_ID" ]; then
+            echo "Error: Failed to extract AMI ID from Packer output."
+            exit 1
     
           echo "✅ Built AMI ID: $AMI_OUTPUT"
           echo "ami-id=$AMI_OUTPUT" >> $GITHUB_OUTPUT
