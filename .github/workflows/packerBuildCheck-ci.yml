@@ -171,12 +171,20 @@ jobs:
           echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
       # Step 4: Set New Version as Default in Launch Template
+      # - name: Set Default Launch Template Version
+      #   run: |
+      #     echo "Setting new version as default..."
+      #     aws ec2 modify-launch-template \
+      #       --launch-template-id "$LAUNCH_TEMPLATE_ID" \
+      #       --default-version "$NEW_VERSION"
+
       - name: Set Default Launch Template Version
         run: |
           echo "Setting new version as default..."
           aws ec2 modify-launch-template \
-            --launch-template-id "$LAUNCH_TEMPLATE_ID" \
-            --default-version "$NEW_VERSION"
+            --launch-template-id "${{ steps.update-lt.outputs.launch-template-id }}" \
+            --default-version "${{ steps.lt-version.outputs.version }}"
+
 
       # Step 5: Find Auto Scaling Group Name (Optional if hardcoded)
       # - name: Get Auto Scaling Group Name
