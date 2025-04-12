@@ -201,7 +201,7 @@ jobs:
           echo "Updating ASG to use new Launch Template version..."
           aws autoscaling update-auto-scaling-group \
             --auto-scaling-group-name myproject-asg \
-            --launch-template "LaunchTemplateId=${{ steps.update-lt.outputs.launch-template-id }},Version=${{ steps.lt-version.outputs.version }}"
+            --launch-template "LaunchTemplateId=${{ steps.update-lt.outputs.launch-template-id }},Version=${{ steps.update-lt.outputs.version }}"
 
       # Step 7: Trigger Instance Refresh
       - name: Start Instance Refresh
