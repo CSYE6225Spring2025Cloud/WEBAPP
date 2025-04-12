@@ -150,15 +150,10 @@ jobs:
           echo "Latest Launch Template Version: $LATEST_VERSION"
           echo "latest-version=$LATEST_VERSION" >> $GITHUB_OUTPUT
 
-      # Step 3: Create New Launch Template Version with Latest AMI
-      - name: Create Launch Template Version
-        id: lt-version
-        run: |
-          echo "Creating new version for Launch Template: ${{ steps.update-lt.outputs.launch-template-id }}"
           NEW_VERSION=$(aws ec2 create-launch-template-version \
-            --launch-template-id "${{ steps.update-lt.outputs.launch-template-id }}" \
+            --launch-template-id "$LAUNCH_TEMPLATE_ID" \
             --source-version "$LATEST_VERSION" \
-            --launch-template-data "{\"ImageId\":\"${{ steps.build-ami.outputs.ami-id }}\", \"Instancetype\":\"t2.micro\"}" \
+            --launch-template-data "{\"ImageId\":\"${{ steps.build-ami.outputs.ami-id }}\"}" \
             --query "LaunchTemplateVersion.VersionNumber" \
             --output text)
 
@@ -170,20 +165,17 @@ jobs:
           echo "✅ New Launch Template Version: $NEW_VERSION"
           echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
-      # Step 4: Set New Version as Default in Launch Template
+          echo "Setting new version as default..."
+          aws ec2 modify-launch-template \
+            --launch-template-id "$LAUNCH_TEMPLATE_ID" \
+            --default-version "$NEW_VERSION"
+
       # - name: Set Default Launch Template Version
       #   run: |
       #     echo "Setting new version as default..."
       #     aws ec2 modify-launch-template \
-      #       --launch-template-id "$LAUNCH_TEMPLATE_ID" \
-      #       --default-version "$NEW_VERSION"
-
-      - name: Set Default Launch Template Version
-        run: |
-          echo "Setting new version as default..."
-          aws ec2 modify-launch-template \
-            --launch-template-id "${{ steps.update-lt.outputs.launch-template-id }}" \
-            --default-version "${{ steps.lt-version.outputs.version }}"
+      #       --launch-template-id "${{ steps.update-lt.outputs.launch-template-id }}" \
+      #       --default-version "${{ steps.lt-version.outputs.version }}"
 
 
       # Step 5: Find Auto Scaling Group Name (Optional if hardcoded)
