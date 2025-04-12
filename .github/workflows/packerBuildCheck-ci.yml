@@ -158,7 +158,7 @@ jobs:
           NEW_VERSION=$(aws ec2 create-launch-template-version \
             --launch-template-id "${{ steps.update-lt.outputs.launch-template-id }}" \
             --source-version "$LATEST_VERSION" \
-            --launch-template-data "{\"ImageId\":\"${{ steps.build-ami.outputs.ami-id }}\"}" \
+            --launch-template-data "{\"ImageId\":\"${{ steps.build-ami.outputs.ami-id }}\", \"Instancetype\":\"t2.micro\"}" \
             --query "LaunchTemplateVersion.VersionNumber" \
             --output text)
 
