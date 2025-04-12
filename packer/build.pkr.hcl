@@ -21,6 +21,20 @@ build {
   # Provision the instance and create .env dynamically
   provisioner "shell" {
     inline = [
+      "sudo apt-get update -y",
+      "sudo apt-get upgrade -y",
+      "sudo apt-get install -y unzip jq curl",
+
+      "echo '=== Checking and Installing AWS CLI ==='",
+      "if ! command -v aws &> /dev/null; then",
+      "  curl \"https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip\" -o \"awscliv2.zip\"",
+      "  unzip awscliv2.zip",
+      "  sudo ./aws/install",
+      "  rm -rf awscliv2.zip aws",
+      "fi",
+
+      "aws --version",
+
       "echo 'Running setup script...'",
       "sudo apt update -y",
       "sudo apt upgrade -y",
