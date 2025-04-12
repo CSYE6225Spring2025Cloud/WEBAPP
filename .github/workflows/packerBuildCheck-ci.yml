@@ -2,14 +2,14 @@ name: Build Packer Custom Image
 
 on:
   pull_request:
-    # types:
-    #   - closed
+    types:
+      - closed
     branches:
       - main
 
 jobs:
   build-and-deploy:
-    # if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true
     name: Build and Deploy Custom Image
     runs-on: ubuntu-latest
 
@@ -131,11 +131,11 @@ jobs:
             --output text)
 
           if [ -z "$LAUNCH_TEMPLATE_ID" ] || [ "$LAUNCH_TEMPLATE_ID" == "None" ]; then
-            echo "❌ Launch Template not found."
+            echo "Launch Template not found."
             exit 1
           fi
 
-          echo "✅ Launch Template ID: $LAUNCH_TEMPLATE_ID"
+          echo "Launch Template ID: $LAUNCH_TEMPLATE_ID"
           echo "launch-template-id=$LAUNCH_TEMPLATE_ID" >> $GITHUB_OUTPUT
 
 
@@ -158,11 +158,11 @@ jobs:
             --output text)
 
           if [ -z "$NEW_VERSION" ]; then
-            echo "❌ Failed to create new launch template version"
+            echo "Failed to create new launch template version"
             exit 1
           fi
 
-          echo "✅ New Launch Template Version: $NEW_VERSION"
+          echo "New Launch Template Version: $NEW_VERSION"
           echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
           echo "Setting new version as default..."
@@ -188,11 +188,11 @@ jobs:
       #       --output text)
 
       #     if [ -z "$ASG_NAME" ]; then
-      #       echo "❌ Auto Scaling Group not found!"
+      #       echo "Auto Scaling Group not found!"
       #       exit 1
       #     fi
 
-      #     echo "✅ ASG Name: $ASG_NAME"
+      #     echo "ASG Name: $ASG_NAME"
       #     echo "asg-name=$ASG_NAME" >> $GITHUB_OUTPUT
 
       # Step 6: Update Auto Scaling Group to Use New Launch Template Version
@@ -215,11 +215,11 @@ jobs:
             --output text)
 
           if [ -z "$REFRESH_ID" ]; then
-            echo "❌ Failed to start instance refresh"
+            echo "Failed to start instance refresh"
             exit 1
           fi
 
-          echo "✅ Instance Refresh ID: $REFRESH_ID"
+          echo " Instance Refresh ID: $REFRESH_ID"
           echo "InstanceRefreshId=$REFRESH_ID" >> $GITHUB_OUTPUT
 
       # Step 8: Wait for Instance Refresh Completion
