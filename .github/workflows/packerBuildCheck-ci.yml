@@ -84,13 +84,27 @@ jobs:
         run: packer init -upgrade packer/
 
       - name: Build Custom Image
+        id: build-ami
         run: |
-          packer build \
+          AMI_OUTPUT=$(packer build \
+            -machine-readable \
             -var "aws_region=${{ secrets.AWS_REGION }}" \
             -var "mysql_password=${{ secrets.MYSQL_ROOT_PASSWORD }}" \
             -var "instance_type=t2.micro" \
             -var "ami_users=[\"${{ secrets.AMI_USERS }}\"]" \
-            packer/
+            packer/ | tee /dev/tty | grep 'artifact,0,id' | cut -d, -f6 | cut -d: -f2)
+    
+          echo "✅ Built AMI ID: $AMI_OUTPUT"
+          echo "ami-id=$AMI_OUTPUT" >> $GITHUB_OUTPUT
+
+      # - name: Build Custom Image
+      #   run: |
+      #     packer build \
+      #       -var "aws_region=${{ secrets.AWS_REGION }}" \
+      #       -var "mysql_password=${{ secrets.MYSQL_ROOT_PASSWORD }}" \
+      #       -var "instance_type=t2.micro" \
+      #       -var "ami_users=[\"${{ secrets.AMI_USERS }}\"]" \
+      #       packer/
 
       - name: Configure AWS Credentials (DEMO) 
         uses: aws-actions/configure-aws-credentials@v2
@@ -98,6 +112,10 @@ jobs:
           aws-access-key-id: ${{ secrets.DEMO_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.DEMO_AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
+      
+      - name: Debug AMI ID
+        run: |
+          echo "AMI ID is: ${{ steps.build-ami.outputs.ami-id }}"
 
       # Step 2: Find Launch Template ID Dynamically
       - name: Find Launch Template ID
