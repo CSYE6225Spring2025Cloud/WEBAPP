@@ -10,9 +10,9 @@ app.use(bodyParser.json());
 app.use('/healthz',healthRoutes);
 app.use('/', fileRoutes); // Register new file routes
 
-// cicd
-// const cicdRoutes = require('./routes/cicdRoutes');
-// app.use('/', cicdRoutes);
+cicd
+const cicdRoutes = require('./routes/cicdRoutes');
+app.use('/', cicdRoutes);
 
 
 app.use((err,req,res,next) =>{

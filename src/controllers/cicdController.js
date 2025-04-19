@@ -1,4 +1,4 @@
-/* const { HealthCheck } = require("../models");
+const { HealthCheck } = require("../models");
 const logger = require("../logger");
 const StatsD = require('statsd-client');
 const statsd = new StatsD({ host: 'localhost', port: 8125, prefix: 'webapp' });
@@ -63,4 +63,3 @@ const methodNotAllowed = (req, res) => {
 };
 
 module.exports = { cicdCheck, methodNotAllowed };
- */
